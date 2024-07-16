@@ -1,0 +1,56 @@
+using UnityEngine;
+
+public class PlatformController : MonoBehaviour
+{
+    public float moveDistance = 1.0f;
+    public float moveSpeed = 1.0f; // Speed 
+    private bool isPlayerOnPlatform = false;
+    private bool isMoving = false;
+    private Vector3 originalPosition;
+
+    void Start()
+    {
+        originalPosition = transform.position;
+    }
+
+    void Update()
+    {
+        
+        if (isPlayerOnPlatform && Input.GetKeyDown(KeyCode.E) && !isMoving)
+        {
+            StartCoroutine(MovePlatformDown());
+        }
+    }
+
+    IEnumerator MovePlatformDown()
+    {
+        isMoving = true;
+
+        float targetY = originalPosition.y - moveDistance;
+        Vector3 targetPosition = new Vector3(originalPosition.x, targetY, originalPosition.z);
+
+        while (transform.position.y > targetPosition.y)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        isMoving = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerOnPlatform = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerOnPlatform = false;
+        }
+    }
+}
