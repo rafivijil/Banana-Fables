@@ -1,0 +1,74 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ElevatorController : MonoBehaviour
+{
+    public float speed = 3.0f; // Elevator movement speed
+    public float minY = 0.0f; // Minimum Y position (ground level)
+    public float maxY = 10.0f; // Maximum Y position (top floor)
+
+    private bool isMoving = false; // Flag to track whether the elevator is moving
+    private bool movingUp = false; // Flag to track elevator direction
+
+    void Update()
+    {
+        // Check if elevator is moving and in which direction
+        if (isMoving)
+        {
+            if (movingUp)
+            {
+                // Move the elevator up
+                transform.Translate(Vector3.up * speed * Time.deltaTime);
+                if (transform.position.y >= maxY)
+                {
+                    // Stop moving if reached the top floor
+                    isMoving = false;
+                }
+            }
+            else
+            {
+                // Move the elevator down
+                transform.Translate(Vector3.down * speed * Time.deltaTime);
+                if (transform.position.y <= minY)
+                {
+                    // Stop moving if reached the ground level
+                    isMoving = false;
+                }
+            }
+        }
+    }
+
+    // Method to start moving the elevator up
+    public void MoveUp()
+    {
+        if (!isMoving && transform.position.y < maxY)
+        {
+            isMoving = true;
+            movingUp = true;
+        }
+    }
+
+    // Method to start moving the elevator down
+    public void MoveDown()
+    {
+        if (!isMoving && transform.position.y > minY)
+        {
+            isMoving = true;
+            movingUp = false;
+        }
+    }
+
+    // Detect player interaction with the elevator
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // Debug log to indicate that the player has entered the elevator trigger zone
+            Debug.Log("Player entered elevator trigger zone.");
+
+            // When player enters the elevator, start moving it up
+            MoveUp();
+        }
+    }
+}
