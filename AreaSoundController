@@ -1,0 +1,93 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AreaSoundController : MonoBehaviour
+{
+    public AudioClip defaultClip;
+    public AudioClip area1Clip;
+    public AudioClip area2Clip;
+    public AudioClip area3Clip; // New area clip
+    private AudioSource audioSource;
+    private bool isInArea1 = false;
+    private bool isInArea2 = false;
+    private bool isInArea3 = false; // Track the new area
+    private Rigidbody rb;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        rb = GetComponent<Rigidbody>(); // Assuming the player has a Rigidbody component
+    }
+
+    void Update()
+    {
+        if (IsPlayerMoving())
+        {
+            if (isInArea1 || isInArea2 || isInArea3)
+            {
+                if (!audioSource.isPlaying)
+                {
+                    audioSource.Play();
+                }
+            }
+            else
+            {
+                // Play default sound if the player is not in any area
+                if (audioSource.clip != defaultClip || !audioSource.isPlaying)
+                {
+                    audioSource.clip = defaultClip;
+                    audioSource.Play();
+                }
+            }
+        }
+        else
+        {
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Area1"))
+        {
+            isInArea1 = true;
+            audioSource.clip = area1Clip;
+        }
+        else if (other.gameObject.CompareTag("Area2"))
+        {
+            isInArea2 = true;
+            audioSource.clip = area2Clip;
+        }
+        else if (other.gameObject.CompareTag("Area3"))
+        {
+            isInArea3 = true;
+            audioSource.clip = area3Clip;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Area1"))
+        {
+            isInArea1 = false;
+        }
+        else if (other.gameObject.CompareTag("Area2"))
+        {
+            isInArea2 = false;
+        }
+        else if (other.gameObject.CompareTag("Area3"))
+        {
+            isInArea3 = false;
+        }
+    }
+
+    bool IsPlayerMoving()
+    {
+        // Check if the player's velocity magnitude is greater than a small threshold
+        return rb.velocity.magnitude > 0.1f;
+    }
+}
